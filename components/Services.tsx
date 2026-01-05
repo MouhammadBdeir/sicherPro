@@ -68,7 +68,7 @@ export default function Services() {
                             <p className="text-[#6B7280] text-center mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">{service.desc}</p>
                             <Link href={service.href}>
                                 <button className="w-full bg-[#587D85] text-white py-3 sm:py-4 rounded-full hover:bg-[#3A3A3A] transition-all duration-300 font-semibold shadow-md sm:shadow-lg text-sm sm:text-base">
-                                    Details & Angebot
+                                    Details
                                 </button>
                             </Link>
                         </motion.div>
