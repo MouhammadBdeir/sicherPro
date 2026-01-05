@@ -10,6 +10,7 @@ export default function Dashboard() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const sessionTimeout = Number(process.env.NEXT_PUBLIC_SESSION_TIMEOUT) || 3600000;
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -22,6 +23,17 @@ export default function Dashboard() {
         });
         return () => unsubscribe();
     }, [router]);
+
+    useEffect(() => {
+        if (user) {
+            const timer = setTimeout(() => {
+                signOut(auth);
+                router.push('/admin/login');
+            }, sessionTimeout );
+
+            return () => clearTimeout(timer);
+        }
+    }, [user, router]);
 
     const handleLogout = async () => {
         await signOut(auth);
@@ -59,15 +71,24 @@ export default function Dashboard() {
                         Hier können Sie Bilder hochladen, Kontaktdaten bearbeiten und eingehende Anfragen verwalten.
                     </p>
                     <div className="mt-12 space-y-6">
-                        {/* Nach den bestehenden Links */}
                         <Link href="/admin/dashboard/image-management" className="block bg-[#587D85] text-white py-6 rounded-2xl text-2xl font-bold hover:bg-[#3A3A3A] transition-all shadow-lg">
                             Bilder verwalten
                         </Link>
-                        <Link href="/admin/dashboard/contact-management" className="block bg-[#587D85] text-white py-6 rounded-2xl text-2xl font-bold hover:bg-[#3A3A3A] transition-all shadow-lg">
-                            Kontaktdaten & Anfragen
+
+                        {/* NEUER BUTTON – Firmen-/Kontaktdaten verwalten */}
+                        <Link
+                            href="/admin/dashboard/contact-data"
+                            className="block bg-[#587D85] text-white py-6 rounded-2xl text-2xl font-bold hover:bg-[#3A3A3A] transition-all shadow-lg"
+                        >
+                            Kontaktdaten verwalten (E-Mail, Telefon, Mobil etc.)
                         </Link>
+
+                        <Link href="/admin/dashboard/contact-management" className="block bg-[#587D85] text-white py-6 rounded-2xl text-2xl font-bold hover:bg-[#3A3A3A] transition-all shadow-lg">
+                            Anfragen verwalten
+                        </Link>
+
                         <Link href="/" className="block bg-[#587D85] text-white py-6 rounded-2xl text-2xl font-bold hover:bg-[#3A3A3A] transition-all shadow-lg">
-                            Zu Seite
+                            Zur Webseite
                         </Link>
                     </div>
                 </motion.div>

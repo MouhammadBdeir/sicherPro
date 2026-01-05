@@ -1,23 +1,36 @@
 'use client';
-import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useWebsiteImages } from '@/hooks/useWebsiteImages';
+import {doc, onSnapshot} from 'firebase/firestore';
+import {db} from '@/lib/firebase';
+import {useEffect, useState} from 'react';
+
+import {useWebsiteImages} from '@/hooks/useWebsiteImages';
 
 interface NavProps {
     isScrolled: boolean;
 }
 
-export default function Nav({ isScrolled }: NavProps) {
+export default function Nav({isScrolled}: NavProps) {
     const [servicesOpen, setServicesOpen] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-    const { images, loading } = useWebsiteImages();
+    const {images, loading} = useWebsiteImages();
     const logoUrl = images.home_logo || '/logo-transparent.svg';
+    const [contactData, setContactData] = useState<any>(null);
 
     const navTextClass = isScrolled
         ? 'text-[#3A3A3A] hover:text-[#587D85]'
         : 'text-white hover:text-[#587D85]';
+
+    useEffect(() => {
+        const docRef = doc(db, 'contactData', 'main');
+        const unsubscribe = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                setContactData(docSnap.data());
+            }
+        });
+        return () => unsubscribe();
+    }, []);
 
     return (
         <div
@@ -29,11 +42,23 @@ export default function Nav({ isScrolled }: NavProps) {
         >
             {/* ================= TOP BAR ================= */}
             <div className="bg-[#587D85] text-white py-3 px-6">
-                <div className="max-w-7xl mx-auto flex justify-end space-x-8 text-sm">
-                    <a href="tel:+49015755537863">01575 - 5537863</a>
-                    <a href="mailto:info@sicherpro.de">info@sicherpro.de</a>
+                <div className="max-w-7xl mx-auto flex flex-wrap justify-end gap-6 text-sm">
+                    {(contactData?.phone || contactData?.mobile) && (
+                        <span>
+                <strong>Telefon:</strong>{' '}
+                            <a href={`tel:${contactData?.phone || contactData?.mobile}`}>
+                    {contactData?.phone || contactData?.mobile}
+                </a>
+            </span>
+                    )}
+                    {contactData?.email && (
+                        <span>
+                <strong>E-Mail:</strong> <a href={`mailto:${contactData.email}`}>{contactData.email}</a>
+            </span>
+                    )}
                 </div>
             </div>
+
 
             {/* ================= MAIN NAV ================= */}
             <nav className="py-5 px-6">
@@ -42,7 +67,7 @@ export default function Nav({ isScrolled }: NavProps) {
                     {/* Logo – jetzt dynamisch */}
                     <Link href="/">
                         {loading ? (
-                            <div className="w-[150px] h-[50px] bg-gray-200 animate-pulse rounded" />
+                            <div className="w-[150px] h-[50px] bg-gray-200 animate-pulse rounded"/>
                         ) : (
                             <img
                                 src={logoUrl}
@@ -90,106 +115,109 @@ export default function Nav({ isScrolled }: NavProps) {
                             {/* Dropdown */}
                             <div
                                 className={`
-                                    absolute top-full mt-6
-                                    left-1/2 -translate-x-1/2
-                                    w-[90vw] max-w-[960px]
-                                    bg-white rounded-3xl shadow-2xl border border-secondary/20
-                                    transition-all duration-300
-                                    ${
-                                    servicesOpen
-                                        ? 'opacity-100 translate-y-0'
-                                        : 'opacity-0 pointer-events-none -translate-y-4'
+    absolute top-full mt-6
+    left-1/2 sm:left-[20%] lg:left-[10%]  /* Container nach links verschieben */
+    w-[90vw] max-w-[960px]
+    bg-white rounded-3xl shadow-2xl border border-secondary/20
+    transition-all duration-300
+    ${servicesOpen
+                                    ? 'opacity-100 translate-y-0'
+                                    : 'opacity-0 pointer-events-none -translate-y-4'
                                 }
-                                `}
+  `}
+                                style={{
+                                    transform: servicesOpen ? 'translateX(-50%)' : 'translateX(-50%) translateY(-1rem)'
+                                }}
                             >
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 sm:p-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8">
 
+                                {/* Link Items */}
                                     <Link
                                         href="/dienstleistungen/objektschutz"
-                                        className="group p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
+                                        className="group p-4 sm:p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
                                     >
                                         <h4 className="text-lg font-semibold text-[#3A3A3A] group-hover:text-[#587D85]">
                                             Objektschutz
                                         </h4>
-                                        <p className="mt-2 text-sm text-[#3A3A3A]/70">
+                                        <p className="mt-1 sm:mt-2 text-sm text-[#3A3A3A]/70">
                                             Schutz von Gebäuden & Anlagen
                                         </p>
                                     </Link>
 
                                     <Link
                                         href="/dienstleistungen/veranstaltungsschutz"
-                                        className="group p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
+                                        className="group p-4 sm:p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
                                     >
                                         <h4 className="text-lg font-semibold text-[#3A3A3A] group-hover:text-[#587D85]">
                                             Veranstaltungsschutz
                                         </h4>
-                                        <p className="mt-2 text-sm text-[#3A3A3A]/70">
+                                        <p className="mt-1 sm:mt-2 text-sm text-[#3A3A3A]/70">
                                             Sicherheit für Events
                                         </p>
                                     </Link>
 
                                     <Link
                                         href="/dienstleistungen/personenschutz"
-                                        className="group p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
+                                        className="group p-4 sm:p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
                                     >
                                         <h4 className="text-lg font-semibold text-[#3A3A3A] group-hover:text-[#587D85]">
                                             Personenschutz
                                         </h4>
-                                        <p className="mt-2 text-sm text-[#3A3A3A]/70">
+                                        <p className="mt-1 sm:mt-2 text-sm text-[#3A3A3A]/70">
                                             Schutz von Personen & VIPs
                                         </p>
                                     </Link>
 
                                     <Link
                                         href="/dienstleistungen/mobiler-wachdienst-revierkontrollen"
-                                        className="group p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
+                                        className="group p-4 sm:p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
                                     >
                                         <h4 className="text-lg font-semibold text-[#3A3A3A] group-hover:text-[#587D85]">
                                             Mobiler Wachdienst & Revierkontrollen
                                         </h4>
-                                        <p className="mt-2 text-sm text-[#3A3A3A]/70">
+                                        <p className="mt-1 sm:mt-2 text-sm text-[#3A3A3A]/70">
                                             Flexible Kontrollfahrten & Präsenz
                                         </p>
                                     </Link>
 
                                     <Link
                                         href="/dienstleistungen/brandwache"
-                                        className="group p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
+                                        className="group p-4 sm:p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
                                     >
                                         <h4 className="text-lg font-semibold text-[#3A3A3A] group-hover:text-[#587D85]">
                                             Brandwache
                                         </h4>
-                                        <p className="mt-2 text-sm text-[#3A3A3A]/70">
+                                        <p className="mt-1 sm:mt-2 text-sm text-[#3A3A3A]/70">
                                             Schutz vor Brandgefahren & Feuerkontrolle
                                         </p>
                                     </Link>
 
                                     <Link
                                         href="/dienstleistungen/baustellenbewachung"
-                                        className="group p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
+                                        className="group p-4 sm:p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
                                     >
                                         <h4 className="text-lg font-semibold text-[#3A3A3A] group-hover:text-[#587D85]">
                                             Baustellenbewachung
                                         </h4>
-                                        <p className="mt-2 text-sm text-[#3A3A3A]/70">
+                                        <p className="mt-1 sm:mt-2 text-sm text-[#3A3A3A]/70">
                                             Schutz von Baustellen & Material
                                         </p>
                                     </Link>
 
                                     <Link
                                         href="/dienstleistungen/bewachung-von-unterkuenften"
-                                        className="group p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
+                                        className="group p-4 sm:p-6 rounded-2xl hover:bg-[#D9DEDF]/50 transition-colors duration-300"
                                     >
                                         <h4 className="text-lg font-semibold text-[#3A3A3A] group-hover:text-[#587D85]">
                                             Bewachung von Unterkünften
                                         </h4>
-                                        <p className="mt-2 text-sm text-[#3A3A3A]/70">
+                                        <p className="mt-1 sm:mt-2 text-sm text-[#3A3A3A]/70">
                                             Ordnung & Sicherheit in Unterkünften
                                         </p>
                                     </Link>
-
                                 </div>
                             </div>
+
                         </li>
 
                         <li>

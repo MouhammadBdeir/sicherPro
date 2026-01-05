@@ -60,7 +60,7 @@ export default function Hero() {
                     className="text-lg md:text-xl text-[#D9DEDF] mb-12 max-w-3xl mx-auto drop-shadow-md"
                     variants={itemVariants}
                 >
-                    Maßgeschneiderte Sicherheitslösungen für öffentliche, gewerbliche und private Bereiche – mit über 15 Jahren Erfahrung und höchsten Zertifizierungen.
+                    Maßgeschneiderte Sicherheitslösungen für öffentliche, gewerbliche und private Bereiche – mit über 8 Jahren Erfahrung und höchsten Zertifizierungen.
                 </motion.p>
                 <Link href="/kontakt">
                     <motion.button

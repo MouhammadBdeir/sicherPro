@@ -12,14 +12,19 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-
+    const sessionTimeout = Number(process.env.NEXT_PUBLIC_SESSION_TIMEOUT) || 3600000;
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            setTimeout(async () => {
+                await auth.signOut();
+                alert('Session abgelaufen. Du wurdest ausgeloggt.');
+                router.push('/admin/login');
+            }, sessionTimeout);
             router.push('/admin/dashboard');
         } catch (err: any) {
             if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {

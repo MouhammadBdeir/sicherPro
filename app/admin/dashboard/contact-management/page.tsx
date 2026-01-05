@@ -28,7 +28,7 @@ export default function ContactManagement() {
     const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const router = useRouter();
-
+    const sessionTimeout = Number(process.env.NEXT_PUBLIC_SESSION_TIMEOUT) || 3600000;
     // Auth
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -37,6 +37,16 @@ export default function ContactManagement() {
         });
         return () => unsubscribe();
     }, [router]);
+    useEffect(() => {
+        if (user) {
+            const timer = setTimeout(() => {
+                signOut(auth);
+                router.push('/admin/login');
+            }, sessionTimeout );
+
+            return () => clearTimeout(timer);
+        }
+    }, [user, router]);
 
     // Echtzeit-Anfragen
     useEffect(() => {
@@ -156,6 +166,12 @@ export default function ContactManagement() {
                             className="bg-[#587D85] text-white py-4 px-8 rounded-2xl text-xl font-bold hover:bg-[#3A3A3A] transition-all shadow-lg text-center"
                         >
                             Zurück zum Dashboard
+                        </Link>
+                        <Link
+                            href="/admin/dashboard/contact-data"
+                            className="bg-[#587D85] text-white py-4 px-8 rounded-2xl text-xl font-bold hover:bg-[#3A3A3A] transition-all shadow-lg text-center"
+                        >
+                            Kontaktdaten verwalten
                         </Link>
                         <Link
                             href="/admin/dashboard/image-management"

@@ -1,19 +1,32 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-import Image from 'next/image';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 
 export default function Impressum() {
     const [isScrolled, setIsScrolled] = useState(false);
     const navRef = useRef<HTMLDivElement>(null);
+    const [contactData, setContactData] = useState<any>(null);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 100);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        const docRef = doc(db, 'contactData', 'main');
+
+        const unsubscribe = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                setContactData(docSnap.data());
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.2 } } };
@@ -30,21 +43,38 @@ export default function Impressum() {
                     <motion.div className="bg-white rounded-3xl p-12 shadow-2xl space-y-8 text-lg leading-relaxed" variants={containerVariants}>
                         <motion.div variants={itemVariants}>
                             <h2 className="text-3xl font-bold mb-4 text-[#587D85]">Angaben gemäß § 5 TMG</h2>
-                            <p>SicherPro Wachschutz GmbH<br />
-                                Ruhrorterstraße 56<br />
-                                47059 Duisburg</p>
+                            <p>
+                                SicherPro Wachschutz GmbH<br />
+                                {contactData?.street || '–'}<br />
+                                {contactData?.zip} {contactData?.city}
+                            </p>
+
                             <br />
                         <motion.div variants={itemVariants}>
-                            <h2 className="text-3xl font-bold mb-4 text-[#587D85]">Kontakt</h2>
-                            <p>Telefon: +49 (0) 1575 - 5537863<br/>
-                                E-Mail: info@sicherpro.de</p>
+                            <p>
+                                {contactData?.phone && (
+                                    <>Telefon: {contactData.phone}<br /></>
+                                )}
+
+                                {contactData?.mobile && (
+                                    <>Mobil: {contactData.mobile}<br /></>
+                                )}
+
+                                {contactData?.email && (
+                                    <>E-Mail: {contactData.email}</>
+                                )}
+                            </p>
+
+
                         </motion.div>
                         </motion.div>
                         <motion.div variants={itemVariants}>
                             <h2 className="text-3xl font-bold mb-4 text-[#587D85]">Vertretungsberechtigt</h2>
-                            <p>Geschäftsführer: Ratib Al Salih<br />
-                                Registergericht: Amtsgericht Düsseldorf<br />
-                                Handelsregisternummer: HRB [Nummer]</p>
+                            <p>
+                                Geschäftsführer: {contactData?.managingDirector || '–'}<br />
+                                Registergericht: {contactData?.registerCourt || '–'}<br />
+                                Handelsregisternummer: {contactData?.commercialRegisterNumber || '–'}
+                            </p>
                         </motion.div>
                         <motion.div variants={itemVariants}>
                             <h2 className="text-3xl font-bold mb-4 text-[#587D85]">Haftungsausschluss</h2>
