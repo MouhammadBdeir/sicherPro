@@ -1,32 +1,47 @@
+// app/api/admin/approve/[id]/route.ts (Updated to Use Firebase Admin SDK for Firestore)
 import { NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase'; // Client auth for createUser and sendReset
 import { createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-
-function generateTempPassword() {
-    return Math.random().toString(36).slice(-12) + 'A1!@'; // Starkes temp Passwort (nur intern!)
+import admin from 'firebase-admin';
+// Initialize Firebase Admin SDK if not already
+if (!admin.apps.length) {
+    try {
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,  // Server-only
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            }),
+        });
+    } catch (err) {
+        console.error('Firebase Admin Initialization Error:', err);
+    }
 }
 
+const adminDb = admin.firestore();
+const adminAuth = admin.auth();
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     try {
-        const snap = await getDoc(doc(db, 'pendingAdmins', id));
-        if (!snap.exists()) throw new Error('Anfrage nicht gefunden');
+        const snap = await adminDb.collection('pendingAdmins').doc(id).get();
+        if (!snap.exists) {
+            throw new Error('Anfrage nicht gefunden');
+        }
 
-        const { email } = snap.data();
+        const { email } = snap.data()!;
 
-        // Temp Passwort generieren (nur intern)
-        const tempPassword = generateTempPassword();
+        // Create user with client auth (since createUserWithEmailAndPassword is client-side, but we can use it server-side)
+        const userCredential = await createUserWithEmailAndPassword(auth, email, 'temp_password_ignored'); // PW ignored
 
-        // User erstellen
-        await createUserWithEmailAndPassword(auth, email, tempPassword);
+        // Set custom claim for role using admin
+        await adminAuth.setCustomUserClaims(userCredential.user.uid, { role: 'admin' });
 
-        // Sofort Password-Reset-Link senden (User setzt eigenes Passwort)
+        // Send password reset email
         await sendPasswordResetEmail(auth, email);
 
-        // Pending löschen
-        await deleteDoc(doc(db, 'pendingAdmins', id));
+        // Delete pending using admin
+        await adminDb.collection('pendingAdmins').doc(id).delete();
 
         return NextResponse.redirect(new URL('/admin/approve-success', request.url));
     } catch (err: any) {

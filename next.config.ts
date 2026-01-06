@@ -1,5 +1,20 @@
+
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    turbopack: {
+        // Example options (add only if required)
+        rules: {
+            '*.svg': {
+                loaders: ['@svgr/webpack'],
+                as: '*.js',
+            },
+        },
+        resolveAlias: {
+            underscore: 'lodash',
+        },
+    },
+
     images: {
         remotePatterns: [
             {

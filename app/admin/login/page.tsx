@@ -1,3 +1,4 @@
+// app/admin/login/page.tsx (Login Page - Enhanced with Better Error Handling and Security)
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -12,7 +13,8 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const sessionTimeout = Number(process.env.NEXT_PUBLIC_SESSION_TIMEOUT) || 3600000;
+    const sessionTimeout = Number(process.env.NEXT_PUBLIC_SESSION_TIMEOUT) || 3600000; // 1 hour default
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -20,23 +22,37 @@ export default function Login() {
 
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            setTimeout(async () => {
+            // Set session timeout
+            const timeoutId = setTimeout(async () => {
                 await auth.signOut();
                 alert('Session abgelaufen. Du wurdest ausgeloggt.');
                 router.push('/admin/login');
             }, sessionTimeout);
+
+            // Store timeoutId if needed for cleanup (optional)
             router.push('/admin/dashboard');
         } catch (err: any) {
-            if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-                setError('Falsche E-Mail oder Passwort.');
-            } else if (err.code === 'auth/invalid-credential') {
-                setError('Ungültige Anmeldedaten.');
-            } else if (err.code === 'auth/too-many-requests') {
-                setError('Zu viele Versuche. Versuchen Sie es später erneut.');
-            } else {
-                setError('Login fehlgeschlagen. Bitte versuchen Sie es später erneut.');
+            let errorMessage = 'Login fehlgeschlagen. Bitte versuchen Sie es später erneut.';
+            switch (err.code) {
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                    errorMessage = 'Falsche E-Mail oder Passwort.';
+                    break;
+                case 'auth/invalid-credential':
+                    errorMessage = 'Ungültige Anmeldedaten.';
+                    break;
+                case 'auth/too-many-requests':
+                    errorMessage = 'Zu viele Versuche. Versuchen Sie es später erneut.';
+                    break;
+                case 'auth/user-disabled':
+                    errorMessage = 'Benutzerkonto deaktiviert.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = 'Ungültige E-Mail-Adresse.';
+                    break;
             }
-            console.error(err);
+            setError(errorMessage);
+            console.error('Login Error:', err);
         } finally {
             setLoading(false);
         }
