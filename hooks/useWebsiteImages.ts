@@ -9,20 +9,23 @@ interface WebsiteImages {
     about_image?: string;
     process_image?: string;
     contact_hero?: string;
+
+    //Dienstleistungen
     baustellen_hero?: string;
-    baustellen_image?: string;
+    baustellen_icon?: string;
     brandwache_hero?: string;
-    brandwache_image?: string;
+    brandwache_icon?: string;
     objektschutz_hero?: string;
-    objektschutz_image?: string;
+    objektschutz_icon?: string;
     veranstaltung_hero?: string;
-    veranstaltung_image?: string;
+    veranstaltung_icon?: string;
     personenschutz_hero?: string;
-    personenschutz_image?: string;
+    personenschutz_icon?: string;
     mobiler_hero?: string;
-    mobiler_image?: string;
+    mobiler_icon?: string;
     unterkuenfte_hero?: string;
-    unterkuenfte_image?: string;
+    unterkuenfte_icon?: string;
+
     [key: string]: string | undefined;
 }
 

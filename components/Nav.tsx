@@ -72,7 +72,7 @@ export default function Nav({isScrolled}: NavProps) {
                             <img
                                 src={logoUrl}
                                 alt="SicherPro Wachschutz GmbH"
-                                className="h-[50px] w-auto object-contain"
+                                className="h-[75px] w-auto object-contain"
                             />
                         )}
                     </Link>

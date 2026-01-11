@@ -33,6 +33,16 @@ const imagesList: ImageItem[] = [
     { key: 'personenschutz_hero', label: 'Personenschutz – Hero', category: 'Dienstleistungen' },
     { key: 'mobiler_hero', label: 'Mobiler Wachdienst – Hero', category: 'Dienstleistungen' },
     { key: 'unterkuenfte_hero', label: 'Bewachung von Unterkünften – Hero', category: 'Dienstleistungen' },
+
+    { key: 'baustellen_icon', label: 'Baustellenbewachung – Icon', category: 'Dienstleistungen' },
+    { key: 'brandwache_icon', label: 'Brandwache – Icon', category: 'Dienstleistungen' },
+    { key: 'objektschutz_icon', label: 'Objektschutz – Icon', category: 'Dienstleistungen' },
+    { key: 'veranstaltung_icon', label: 'Veranstaltungsschutz – Icon', category: 'Dienstleistungen' },
+    { key: 'personenschutz_icon', label: 'Personenschutz – Icon', category: 'Dienstleistungen' },
+    { key: 'mobiler_icon', label: 'Mobiler Wachdienst – Icon', category: 'Dienstleistungen' },
+    { key: 'unterkuenfte_icon', label: 'Bewachung von Unterkünften – Icon', category: 'Dienstleistungen' },
+
+
 ];
 
 const categories = ['Alle', 'Startseite', 'Über uns', 'Kontakt', 'Dienstleistungen'];
