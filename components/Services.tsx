@@ -2,7 +2,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import NextImage from 'next/image';
 import { useWebsiteImages } from '@/hooks/useWebsiteImages';
 
 
@@ -84,36 +83,35 @@ export default function Services() {
                     {services.map((service) => (
                         <motion.div
                             key={service.title}
-                            className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-500 border border-[#B2B2AC]/20"
                             variants={itemVariants}
-                            whileHover={{ y: -8 }}
+                            whileHover={{ y: -6 }}
+                            className="relative bg-[#3A3A3A] text-white rounded-3xl overflow-hidden group"
                         >
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-6 sm:mb-8 mx-auto overflow-hidden bg-[#587D85]">
-                                {images[service.iconKey] ? (
+                            <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition">
+                                {images[service.iconKey] && (
                                     <img
                                         src={images[service.iconKey]}
-                                        alt={service.title}
-                                        loading="lazy"
-                                        className="w-full h-full object-cover rounded-full"
+                                        alt=""
+                                        className="w-full h-full object-cover"
                                     />
-                                ) : (
-                                    <div className="w-full h-full bg-white/30 animate-pulse rounded-full" />
                                 )}
                             </div>
-                            <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-[#3A3A3A]">
-                                {service.title}
-                            </h3>
 
-                            <p className="text-[#6B7280] text-center mb-6 leading-relaxed">
-                                {service.desc}
-                            </p>
+                            <div className="relative p-8 flex flex-col justify-between h-80">
+                                <div>
+                                    <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
+                                    <p className="text-white/80 mb-6">{service.desc}</p>
+                                </div>
 
-                            <Link href={service.href}>
-                                <button className="w-full bg-[#587D85] text-white py-3 rounded-full hover:bg-[#3A3A3A] transition-all font-semibold">
-                                    Details
-                                </button>
-                            </Link>
+                                <Link href={service.href}>
+                                    <button className="text-sm font-semibold border border-white px-5 py-2 rounded-full hover:bg-[#587D85] hover:text-white transition">
+                                        Details
+                                    </button>
+                                </Link>
+                            </div>
+
                         </motion.div>
+
                     ))}
                 </div>
             </div>
