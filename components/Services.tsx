@@ -88,18 +88,18 @@ export default function Services() {
                             variants={itemVariants}
                             whileHover={{ y: -8 }}
                         >
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#587D85] rounded-full flex items-center justify-center mb-6 sm:mb-8 mx-auto overflow-hidden">
-                                {!loading && images[service.iconKey] && (
-                                    <NextImage
-                                        src={images[service.iconKey]!}
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-6 sm:mb-8 mx-auto overflow-hidden bg-[#587D85]">
+                                {images[service.iconKey] ? (
+                                    <img
+                                        src={images[service.iconKey]}
                                         alt={service.title}
-                                        width={48}
-                                        height={48}
-                                        className="object-contain"
+                                        loading="lazy"
+                                        className="w-full h-full object-cover rounded-full"
                                     />
+                                ) : (
+                                    <div className="w-full h-full bg-white/30 animate-pulse rounded-full" />
                                 )}
                             </div>
-
                             <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-[#3A3A3A]">
                                 {service.title}
                             </h3>
